@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Res } from '@nestjs/common'
-import { LoginData } from 'src/types/loginData'
+import { loginProps } from 'src/types/login'
 import { Connection } from 'typeorm'
 import { Response } from 'express'
 
@@ -8,21 +8,25 @@ export class LoginController {
     constructor(private readonly db: Connection) {}
 
     @Post('/login')
-    async authLogin(@Body() data: LoginData, @Res() res: Response) {
-        const queryResult = await this.db.query('SELECT * FROM user')
-        const existUser = queryResult.find(
-            (row: any) =>
-                row.email === data.email && row.password === data.password
-        )
-
-        if (existUser) {
-            const user = {
-                name: queryResult[0].email,
-                userID: queryResult[0].userID,
+    async authLogin(@Body() data: loginProps, @Res() res: Response) {
+        try {
+            const sql = 'SELECT * FROM user'
+            const queryResult = await this.db.query(sql)
+            const existUser = queryResult.find(
+                (row: any) =>
+                    row.email === data.email && row.password === data.password
+            )
+            if (existUser) {
+                const user = {
+                    email: queryResult[0].email,
+                    userID: queryResult[0].userID,
+                }
+                res.status(201).json(user)
+            } else {
+                res.status(401).json({ message: 'Usuário não encontrado!' })
             }
-            res.status(201).json(user)
-        } else {
-            res.status(401).json({ message: 'recusado' })
+        } catch (error) {
+            console.log(error)
         }
     }
 }
