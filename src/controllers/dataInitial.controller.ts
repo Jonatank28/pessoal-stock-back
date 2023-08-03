@@ -18,7 +18,17 @@ export class DataInitialController {
             LIMIT 1;
             `
             const resultSqlGet = await this.db.query(sqlGet)
-            const sqlGetTransaction = 'SELECT * FROM transaction'
+            const sqlGetTransaction = `
+            SELECT 
+            a.transactionID,
+                a.description, 
+                a.creationDate,
+                a.value,
+                (SELECT c.name FROM tag AS c  WHERE c.tagID = a.tagID) as tagID,
+                (SELECT b.name FROM type AS b WHERE b.typeID = a.typeID) as typeID  
+            FROM 
+            transaction AS a;
+            `
             const resultsqlGetTransaction = await this.db.query(
                 sqlGetTransaction
             )
@@ -27,6 +37,7 @@ export class DataInitialController {
                 transactions: resultsqlGetTransaction,
                 balanceGlobal: resultSqlGet[0],
             }
+            console.log('🚀 ~ result:', result)
             res.status(201).json(result)
         } catch (error) {
             console.log(error)
