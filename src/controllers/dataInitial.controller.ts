@@ -1,23 +1,26 @@
-import { Controller, Get, Res } from '@nestjs/common'
+import { Body, Controller, Post, Res } from '@nestjs/common'
 import { Connection } from 'typeorm'
 import { Response } from 'express'
+import { transactionProps } from 'src/types/transaction'
 
 @Controller('api/dataInitial')
 export class DataInitialController {
     constructor(private readonly db: Connection) {}
 
-    @Get()
-    async authLogin(@Res() res: Response) {
+    @Post()
+    async DataInitial(@Body() data, @Res() res: Response) {
         try {
+            const userID = data.data.userID
             const sqlGet = `
             SELECT
-                ROUND(COALESCE((SELECT SUM(value) FROM transaction WHERE typeID = 2), 0), 2) AS revenue,
-                ROUND(COALESCE((SELECT SUM(value) FROM transaction WHERE typeID = 1), 0), 2) AS expense,
-                ROUND(COALESCE((SELECT SUM(value) FROM transaction WHERE typeID = 2), 0) - COALESCE((SELECT SUM(value) FROM transaction WHERE typeID = 1), 0), 2) AS currentBalance
-            FROM transaction
+                ROUND(COALESCE((SELECT SUM(b.value) FROM transaction AS b WHERE b.typeID = 2 AND b.userID = a.userID), 0), 2) AS revenue,
+                ROUND(COALESCE((SELECT SUM(c.value) FROM transaction AS c WHERE c.typeID = 1 AND c.userID = a.userID), 0), 2) AS expense,
+                ROUND(COALESCE((SELECT SUM(b.value) FROM transaction AS b WHERE b.typeID = 2 AND b.userID = a.userID), 0) - COALESCE((SELECT SUM(c.value) FROM transaction AS c WHERE c.typeID = 1 AND c.userID = a.userID), 0), 2) AS currentBalance
+            FROM transaction AS a
+            WHERE a.userID = ?
             LIMIT 1;
             `
-            const resultSqlGet = await this.db.query(sqlGet)
+            const resultSqlGet = await this.db.query(sqlGet, [userID])
             const sqlGetTransaction = `
             SELECT 
             a.transactionID,
@@ -28,10 +31,12 @@ export class DataInitialController {
                 (SELECT b.name FROM type AS b WHERE b.typeID = a.typeID) as typeID  
             FROM 
             transaction AS a
+            WHERE userID = ?
             ORDER BY 1 DESC;
             `
             const resultsqlGetTransaction = await this.db.query(
-                sqlGetTransaction
+                sqlGetTransaction,
+                [userID]
             )
             const sqlGetTypes = 'SELECT typeID AS id, name FROM type'
             const resultSqlGetTypes = await this.db.query(sqlGetTypes)

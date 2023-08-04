@@ -5,4 +5,5 @@ export interface transactionProps {
     creationDate: Date
     typeID: number
     tagID: number
+    userID: number
 }

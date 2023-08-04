@@ -8,7 +8,7 @@ export class TransactionController {
     constructor(private readonly db: Connection) {}
 
     @Post('/new')
-    async authLogin(@Body() data: transactionProps, @Res() res: Response) {
+    async Transaction(@Body() data: transactionProps, @Res() res: Response) {
         try {
             const sqlInsert = 'INSERT INTO transaction SET ?'
             const resultSqlInsert = await this.db.query(sqlInsert, [data])

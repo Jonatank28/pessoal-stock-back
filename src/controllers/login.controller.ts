@@ -10,8 +10,8 @@ export class LoginController {
     @Post('/login')
     async authLogin(@Body() data: loginProps, @Res() res: Response) {
         try {
-            const sql = 'SELECT * FROM user'
-            const queryResult = await this.db.query(sql)
+            const sql = 'SELECT * FROM user WHERE email = ?'
+            const queryResult = await this.db.query(sql, [data.email])
             const existUser = queryResult.find(
                 (row: any) =>
                     row.email === data.email && row.password === data.password
