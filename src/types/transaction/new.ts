@@ -1,4 +1,4 @@
-export interface transactionProps {
+export interface transactionNewProps {
     transactionID: number
     value: number
     description: string

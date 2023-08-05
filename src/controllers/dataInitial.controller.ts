@@ -1,7 +1,6 @@
 import { Body, Controller, Post, Res } from '@nestjs/common'
 import { Connection } from 'typeorm'
 import { Response } from 'express'
-import { transactionProps } from 'src/types/transaction'
 
 @Controller('api/dataInitial')
 export class DataInitialController {
