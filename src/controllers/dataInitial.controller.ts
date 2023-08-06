@@ -22,16 +22,31 @@ export class DataInitialController {
             const resultSqlGet = await this.db.query(sqlGet, [userID])
             const sqlGetTransaction = `
             SELECT 
-            a.transactionID,
+                a.transactionID,
                 a.description, 
-                a.creationDate,
+                CASE 
+                WHEN DATE(a.creationDate) = CURDATE() THEN 'Hoje'
+                WHEN DATE(a.creationDate) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN 'Ontem'
+                ELSE CONCAT(
+                    CASE DAYOFWEEK(a.creationDate)
+                        WHEN 1 THEN 'Domingo'
+                        WHEN 2 THEN 'Segunda-feira'
+                        WHEN 3 THEN 'Terça-feira'
+                        WHEN 4 THEN 'Quarta-feira'
+                        WHEN 5 THEN 'Quinta-feira'
+                        WHEN 6 THEN 'Sexta-feira'
+                        WHEN 7 THEN 'Sábado'
+                    END,
+                    ', ',
+                    DATE_FORMAT(a.creationDate, '%d')
+                    )
+                END as day_date,
                 a.value,
                 (SELECT c.name FROM tag AS c  WHERE c.tagID = a.tagID) as tagID,
                 (SELECT b.name FROM type AS b WHERE b.typeID = a.typeID) as typeID  
-            FROM 
-            transaction AS a
+            FROM  transaction AS a
             WHERE userID = ?
-            ORDER BY 1 DESC;
+            ORDER BY a.transactionID DESC;
             `
             const resultsqlGetTransaction = await this.db.query(
                 sqlGetTransaction,

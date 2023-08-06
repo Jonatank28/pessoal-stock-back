@@ -11,20 +11,20 @@ import {
 import { transactionNewProps } from 'src/types/transaction/new'
 import { Connection } from 'typeorm'
 import { Response } from 'express'
+import { transactionUpdateProps } from 'src/types/transaction/update'
 
 @Controller('api/transaction')
 export class TransactionController {
     constructor(private readonly db: Connection) {}
 
+    // Enviar dados para o front para edição
     @Get('/getData/:id')
-    async TransactionGet(@Body() data, @Res() res: Response) {
+    async TransactionGet(@Param('id') id: number, @Res() res: Response) {
         try {
-            console.log('chegou no getdata', data)
-            // const sqlDelete = 'DELETE FROM transaction WHERE transactionID = ?'
-            // const resultSqlInsert = await this.db.query(sqlDelete, [id])
-            // res.status(201).json({
-            //     message: 'Transação excluida com sucesso!',
-            // })
+            const sqlgetData =
+                'SELECT transactionID, value, description, typeID, tagID FROM transaction WHERE transactionID = ?'
+            const resultSqlgetData = await this.db.query(sqlgetData, [id])
+            res.status(200).json(resultSqlgetData[0])
         } catch (error) {
             console.log(error)
         }
@@ -64,15 +64,26 @@ export class TransactionController {
     }
 
     // Deleta transação existente
-    @Put('/update/:id')
-    async TransactionUpdate(@Body() data, @Res() res: Response) {
+    @Put('/update')
+    async TransactionUpdate(
+        @Body() data: transactionUpdateProps,
+        @Res() res: Response
+    ) {
         try {
             console.log('chegou no update', data)
-            // const sqlDelete = 'DELETE FROM transaction WHERE transactionID = ?'
-            // const resultSqlInsert = await this.db.query(sqlDelete, [id])
-            // res.status(201).json({
-            //     message: 'Transação excluida com sucesso!',
-            // })
+            const sqlUpdate =
+                'UPDATE transaction SET value = ?, description = ?, typeID = ?, tagID = ?, userID = ? WHERE transactionID = ?'
+            const resultsqlUpdate = await this.db.query(sqlUpdate, [
+                data.value,
+                data.description,
+                data.typeID,
+                data.tagID,
+                data.userID,
+                data.transactionID,
+            ])
+            res.status(201).json({
+                message: 'Transação atualizada com sucesso!',
+            })
         } catch (error) {
             console.log(error)
         }
