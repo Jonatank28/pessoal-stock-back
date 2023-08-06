@@ -5,6 +5,7 @@ import { databaseConfig } from './services/databaseConfig'
 import { LoginController } from './controllers/login.controller'
 import { TransactionController } from './controllers/transaction.controller'
 import { DataInitialController } from './controllers/dataInitial.controller'
+import { GraphicsController } from './controllers/graphics.controller'
 
 @Module({
     imports: [TypeOrmModule.forRoot(databaseConfig)],
@@ -12,6 +13,7 @@ import { DataInitialController } from './controllers/dataInitial.controller'
         LoginController,
         TransactionController,
         DataInitialController,
+        GraphicsController,
     ],
     providers: [AppService],
 })

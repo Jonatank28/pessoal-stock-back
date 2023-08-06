@@ -70,7 +70,6 @@ export class TransactionController {
         @Res() res: Response
     ) {
         try {
-            console.log('chegou no update', data)
             const sqlUpdate =
                 'UPDATE transaction SET value = ?, description = ?, typeID = ?, tagID = ?, userID = ? WHERE transactionID = ?'
             const resultsqlUpdate = await this.db.query(sqlUpdate, [
