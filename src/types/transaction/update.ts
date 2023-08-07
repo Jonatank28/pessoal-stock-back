@@ -3,6 +3,7 @@ export interface transactionUpdateProps {
     value: number
     description: string
     typeID: number
+    updateDate: string
     tagID: number
     userID: number
 }

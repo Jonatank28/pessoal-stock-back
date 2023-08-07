@@ -22,7 +22,7 @@ export class TransactionController {
     async TransactionGet(@Param('id') id: number, @Res() res: Response) {
         try {
             const sqlgetData =
-                'SELECT transactionID, value, description, typeID, tagID FROM transaction WHERE transactionID = ?'
+                'SELECT transactionID, value, description, typeID, tagID, updateDate FROM transaction WHERE transactionID = ?'
             const resultSqlgetData = await this.db.query(sqlgetData, [id])
             res.status(200).json(resultSqlgetData[0])
         } catch (error) {
@@ -71,12 +71,13 @@ export class TransactionController {
     ) {
         try {
             const sqlUpdate =
-                'UPDATE transaction SET value = ?, description = ?, typeID = ?, tagID = ?, userID = ? WHERE transactionID = ?'
+                'UPDATE transaction SET value = ?, description = ?, typeID = ?, tagID = ?, updateDate = ?, userID = ? WHERE transactionID = ?'
             const resultsqlUpdate = await this.db.query(sqlUpdate, [
                 data.value,
                 data.description,
                 data.typeID,
                 data.tagID,
+                data.updateDate,
                 data.userID,
                 data.transactionID,
             ])

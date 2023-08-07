@@ -25,10 +25,10 @@ export class DataInitialController {
                 a.transactionID,
                 a.description, 
                 CASE 
-                WHEN DATE(a.creationDate) = CURDATE() THEN 'Hoje'
-                WHEN DATE(a.creationDate) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN 'Ontem'
+                WHEN DATE(a.updateDate) = CURDATE() THEN 'Hoje'
+                WHEN DATE(a.updateDate) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN 'Ontem'
                 ELSE CONCAT(
-                    CASE DAYOFWEEK(a.creationDate)
+                    CASE DAYOFWEEK(a.updateDate)
                         WHEN 1 THEN 'Domingo'
                         WHEN 2 THEN 'Segunda-feira'
                         WHEN 3 THEN 'Terça-feira'
@@ -38,7 +38,7 @@ export class DataInitialController {
                         WHEN 7 THEN 'Sábado'
                     END,
                     ', ',
-                    DATE_FORMAT(a.creationDate, '%d')
+                    DATE_FORMAT(a.updateDate, '%d')
                     )
                 END as day_date,
                 a.value,
@@ -46,7 +46,12 @@ export class DataInitialController {
                 (SELECT b.name FROM type AS b WHERE b.typeID = a.typeID) as typeID  
             FROM  transaction AS a
             WHERE userID = ?
-            ORDER BY a.transactionID DESC;
+            ORDER BY
+                CASE
+                    WHEN DATE(a.updateDate) = CURDATE() THEN 1
+                    WHEN DATE(a.updateDate) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN 2
+                    ELSE 3
+                END, a.updateDate DESC;
             `
             const resultsqlGetTransaction = await this.db.query(
                 sqlGetTransaction,
