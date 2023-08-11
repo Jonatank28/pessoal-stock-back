@@ -131,7 +131,7 @@ export class DataInitialController {
 
             const result = {
                 balanceGlobal: resultSqlGet[0],
-                transactions: transactionsByMonth,
+                transactionsGroup: transactionsByMonth,
                 tags: resultSqlGetTags,
                 types: resultSqlGetTypes,
             }
