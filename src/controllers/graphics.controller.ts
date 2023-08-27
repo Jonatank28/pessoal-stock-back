@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Res } from '@nestjs/common'
 import { Connection } from 'typeorm'
 import { Response } from 'express'
+import { generateRandomColor } from 'src/services/default'
 
 @Controller('api/graphics/:userID')
 export class GraphicsController {
@@ -28,12 +29,29 @@ export class GraphicsController {
             GROUP BY a.name, t.total
             `
             const resultSqlPye = await this.db.query(sqlPye, [userID, userID])
-            const result = {
-                chartPie: resultSqlPye,
+
+            const chartData = {
+                labels: resultSqlPye.map((entry) => entry.tag),
+                datasets: [
+                    {
+                        data: resultSqlPye.map((entry) => entry.valueTotal),
+                        backgroundColor: resultSqlPye.map(() =>
+                            generateRandomColor()
+                        ),
+                        borderColor: resultSqlPye.map(() => '#ffffff'),
+                        borderWidth: 1,
+                    },
+                ],
             }
-            res.status(201).json(result)
+
+            const values = {
+                pie: chartData,
+            }
+
+            res.status(200).json(values)
         } catch (error) {
             console.log(error)
+            res.status(500).json({ error: 'Internal server error' })
         }
     }
 }

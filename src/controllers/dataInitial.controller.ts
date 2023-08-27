@@ -35,7 +35,7 @@ export class DataInitialController {
             WHERE userID = ?
                 AND typeID IN (1, 2)
             GROUP BY year, month_number, month_name
-            ORDER BY year, month_number;
+            ORDER BY year, month_number DESC;
 
              `
             const resultGetMonthTransactions = await this.db.query(
